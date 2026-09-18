@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Smart Cook — промоции, рецепти, спестявания{% endblock %}
+{% block content %}
+  <section class="hero">
+    <p class="kicker">Тази седмица</p>
+    <h1>Готви с това, което е на промоция —<br>не с това, което пише в рецептата.</h1>
+    <p>Smart Cook следи промоциите на основните вериги, предлага рецепти, които пасват,
+       и пресмята колко спестяваш всеки месец спрямо редовните цени.</p>
+
+    <div class="hero-stats">
+      <div class="stat-block">
+        <span class="stat-number">{{ promotions_count }}</span>
+        <span class="stat-label">активни промоции тази седмица</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-number">{{ total_saved_amount }} лв.</span>
+        <span class="stat-label">общо спестени от общността</span>
+      </div>
+    </div>
+
+    <p style="margin-top:1.5rem;">
+      <a class="btn" href="{% url 'promotions:list' %}">Виж промоциите</a>
+      <a class="btn btn--ghost" href="{% url 'recipes:list' %}" style="margin-left:0.6rem;">Разгледай рецепти</a>
+    </p>
+  </section>
+
+  <hr class="divider--perforated">
+
+  <section>
+    <h2>Промоции тази седмица</h2>
+    {% if current_promotions %}
+      <div class="grid">
+        {% for promo in current_promotions %}
+          <article class="price-tag">
+            <span class="badge-savings">-{{ promo.savings_percent }}%</span>
+            <div class="store-label">{{ promo.store.name }}</div>
+            <h3>{{ promo.product.name }}</h3>
+            <div class="price-row">
+              <span class="promo-price">{{ promo.promo_price }} лв.</span>
+              <span class="regular-price">{{ promo.regular_price }} лв.</span>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>Няма качени промоции за текущата седмица. Добавете ги от админ панела.</p>
+    {% endif %}
+  </section>
+
+  <hr class="divider--perforated">
+
+  <section>
+    <h2>Последно добавени рецепти</h2>
+    {% if featured_recipes %}
+      <div class="grid">
+        {% for recipe in featured_recipes %}
+          <a class="recipe-card" href="{% url 'recipes:detail' recipe.pk %}" style="color:inherit;">
+            {% if recipe.image %}
+              <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+            {% else %}
+              <img src="" alt="" style="background:var(--color-line);">
+            {% endif %}
+            <div class="body">
+              <h3>{{ recipe.title }}</h3>
+              <div class="meta">
+                <span class="pill pill--gold">{{ recipe.calories_per_serving }} ккал/порция</span>
+                <span class="pill">{{ recipe.prep_time_minutes }} мин.</span>
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>Все още няма добавени рецепти.</p>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Промоции — Smart Cook{% endblock %}
+{% block content %}
+  <h1>{% if week_start_param %}Промоции за седмица {{ week_start_param }}{% else %}Промоции тази седмица{% endif %}</h1>
+  <p>Всички промоции по-долу могат да се използват за автоматично намиране на подходящи рецепти.</p>
+
+  <form method="get" style="display:flex; gap:1rem; align-items:flex-end; flex-wrap:wrap; margin:1.5rem 0;">
+    <div style="min-width:14rem;">
+      <label for="store">Магазин</label>
+      <select name="store" id="store" onchange="this.form.submit()">
+        <option value="">Всички магазини</option>
+        {% for store in stores %}
+          <option value="{{ store.id }}" {% if store.id == selected_store %}selected{% endif %}>{{ store.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <noscript><button class="btn btn--ghost" type="submit">Филтрирай</button></noscript>
+  </form>
+
+  <hr class="divider--perforated">
+
+  {% if promotions %}
+    <div class="grid">
+      {% for promo in promotions %}
+        <article class="price-tag">
+          <span class="badge-savings">-{{ promo.savings_percent }}%</span>
+          <div class="store-label">{{ promo.store.name }} · {{ promo.product.category.name }}</div>
+          <h3>{{ promo.product.name }}</h3>
+          <div class="price-row">
+            <span class="promo-price">{{ promo.promo_price }} лв.</span>
+            <span class="regular-price">{{ promo.regular_price }} лв.</span>
+          </div>
+          <p style="font-size:0.85rem; color:var(--color-ink-soft); margin:0.5rem 0 0;">
+            за {{ promo.unit_quantity }}{{ promo.product.unit }} · валидна {{ promo.week_start }} – {{ promo.week_end }}
+          </p>
+          {% if promo.source_url %}
+            <a href="{{ promo.source_url }}" target="_blank" rel="noopener" style="font-size:0.85rem;">брошура на магазина →</a>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Няма промоции за избраните критерии. Проверете по-късно или изберете друг магазин.</p>
+  {% endif %}
+{% endblock %}

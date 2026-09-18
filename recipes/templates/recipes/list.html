@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Рецепти — Smart Cook{% endblock %}
+{% block content %}
+  <h1>Рецепти</h1>
+  <p>Всяка рецепта показва изчислените калории на порция на база съставките.</p>
+
+  <form method="get" style="margin: 1.5rem 0;">
+    <label for="tag">Диетичен филтър</label>
+    <select name="tag" id="tag" onchange="this.form.submit()" style="max-width:16rem;">
+      <option value="">Всички рецепти</option>
+      {% for tag in tags %}
+        <option value="{{ tag.id }}" {% if tag.id == selected_tag %}selected{% endif %}>{{ tag.name }}</option>
+      {% endfor %}
+    </select>
+  </form>
+
+  <hr class="divider--perforated">
+
+  {% if recipes %}
+    <div class="grid">
+      {% for recipe in recipes %}
+        <a class="recipe-card" href="{% url 'recipes:detail' recipe.pk %}" style="color:inherit;">
+          {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+          {% endif %}
+          <div class="body">
+            <h3>{{ recipe.title }}</h3>
+            <div class="meta">
+              <span class="pill pill--gold">{{ recipe.calories_per_serving }} ккал/порция</span>
+              <span class="pill">{{ recipe.prep_time_minutes }} мин.</span>
+              <span class="pill">{{ recipe.servings }} порции</span>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Няма рецепти за този филтър.</p>
+  {% endif %}
+{% endblock %}

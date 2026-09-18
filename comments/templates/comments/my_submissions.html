@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Моите предложения — Smart Cook{% endblock %}
+{% block content %}
+  <h1>Моите предложения за менюта</h1>
+
+  {% for submission in submissions %}
+    <div class="comment">
+      <div class="comment-meta">
+        {{ submission.week_start }} ·
+        <strong>
+          {% if submission.status == "approved" %}одобрено
+          {% elif submission.status == "rejected" %}отхвърлено
+          {% else %}чака преглед{% endif %}
+        </strong>
+      </div>
+      <h3 style="margin:0.2rem 0;">{{ submission.title }}</h3>
+      <p style="margin:0; color:var(--color-ink-soft);">
+        {% for recipe in submission.proposed_recipes.all %}{{ recipe.title }}{% if not forloop.last %}, {% endif %}{% endfor %}
+      </p>
+      {% if submission.admin_note %}
+        <p style="margin-top:0.4rem;"><em>Бележка от екипа: {{ submission.admin_note }}</em></p>
+      {% endif %}
+    </div>
+  {% empty %}
+    <p>Все още нямаш изпратени предложения. <a href="{% url 'comments:submit_menu' %}">Предложи меню →</a></p>
+  {% endfor %}
+{% endblock %}

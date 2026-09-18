@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Спестявания — Smart Cook{% endblock %}
+{% block content %}
+  <h1>Твоите спестявания</h1>
+
+  <div class="stat-block" style="margin-bottom:2rem;">
+    <span class="stat-number">{{ total_saved }} лв.</span>
+    <span class="stat-label">общо спестено досега</span>
+  </div>
+
+  <h2>По месеци</h2>
+  {% if monthly_summary %}
+    <table>
+      <thead><tr><th>Месец</th><th class="num">Спестено</th></tr></thead>
+      <tbody>
+        {% for row in monthly_summary %}
+          <tr>
+            <td>{{ row.month|date:"F Y" }}</td>
+            <td class="num">{{ row.saved }} лв.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Все още няма данни за спестявания.</p>
+  {% endif %}
+
+  <hr class="divider--perforated">
+
+  <h2>Седмични записи</h2>
+  {% if records %}
+    <table>
+      <thead>
+        <tr><th>Седмица</th><th class="num">Платено</th><th class="num">Редовна цена</th><th class="num">Спестено</th></tr>
+      </thead>
+      <tbody>
+        {% for record in records %}
+          <tr>
+            <td>{{ record.week_start }}</td>
+            <td class="num">{{ record.total_spent }} лв.</td>
+            <td class="num">{{ record.total_regular_price }} лв.</td>
+            <td class="num">{{ record.amount_saved }} лв. ({{ record.savings_percent }}%)</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Все още няма седмични записи.</p>
+  {% endif %}
+{% endblock %}

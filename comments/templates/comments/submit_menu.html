@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Предложи меню — Smart Cook{% endblock %}
+{% block content %}
+  <h1>Предложи меню</h1>
+  <p>Избери рецепти за седмицата — предложението ти ще чака одобрение от екипа,
+     преди да стане публично меню.</p>
+
+  <form method="post" style="max-width:34rem;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn" type="submit" style="margin-top:1rem;">Изпрати за преглед</button>
+  </form>
+
+  <p style="margin-top:1.5rem;"><a href="{% url 'comments:my_submissions' %}">Виж моите предложения →</a></p>
+{% endblock %}

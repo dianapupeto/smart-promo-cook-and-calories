@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Списък за пазаруване — Smart Cook{% endblock %}
+{% block content %}
+  <h1>Списък за пазаруване</h1>
+
+  {% if shopping_list %}
+    <p style="color:var(--color-ink-soft);">За седмица {{ shopping_list.week_start }}
+      {% if shopping_list.menu %} · от меню „{{ shopping_list.menu }}“{% endif %}</p>
+
+    <div class="hero-stats" style="margin: 1rem 0 2rem;">
+      <div class="stat-block">
+        <span class="stat-number">{{ promo_total }} лв.</span>
+        <span class="stat-label">очаквано плащане (по промо цени)</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-number">{{ potential_savings }} лв.</span>
+        <span class="stat-label">очаквано спестяване</span>
+      </div>
+      {% if savings_record %}
+        <div class="stat-block">
+          <span class="stat-number">{{ savings_record.amount_saved }} лв.</span>
+          <span class="stat-label">реално спестено (потвърдено)</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <p style="color:var(--color-ink-soft); font-size:0.9rem;">
+      Промоциите и продуктите по-долу са добавени от екипа. Ти само потвърждаваш какво реално си купил/а —
+      ако си взел/а повече от нужното (напр. по-голям промо пакет), разликата автоматично отива в
+      "останали продукти" за следваща употреба.
+    </p>
+
+    <form method="post" action="{% url 'shopping:finish_shopping' shopping_list.id %}">
+      {% csrf_token %}
+      {{ formset.management_form }}
+      {% if formset.non_form_errors %}
+        <ul class="messages">{% for error in formset.non_form_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+      {% endif %}
+      <table>
+        <thead>
+          <tr>
+            <th>Продукт</th>
+            <th class="num">Нужно</th>
+            <th>Промоция</th>
+            <th class="num">Купено</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for form in formset %}
+            {{ form.id }}
+            <tr style="{% if form.instance.purchased %}opacity:0.7;{% endif %}">
+              <td>{{ form.instance.product.name }}</td>
+              <td class="num">{{ form.instance.quantity }}{{ form.instance.product.unit }}</td>
+              <td>
+                {% if form.instance.from_promotion %}
+                  {{ form.instance.from_promotion.store.name }} (-{{ form.instance.from_promotion.savings_percent }}%)
+                {% else %}—{% endif %}
+              </td>
+              <td class="num">
+                {{ form.quantity_purchased }}
+                {% if form.quantity_purchased.errors %}
+                  <div style="color:var(--color-tomato); font-size:0.8rem;">{{ form.quantity_purchased.errors|join:", " }}</div>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <button class="btn" type="submit" style="margin-top:1.25rem;">Финализирай пазаруването</button>
+    </form>
+  {% else %}
+    <p>Все още нямаш генериран списък за пазаруване. Той се създава автоматично, след като
+       одобрено меню бъде избрано за седмицата (виж <a href="{% url 'meal_plans:list' %}">менютата</a>).</p>
+  {% endif %}
+{% endblock %}

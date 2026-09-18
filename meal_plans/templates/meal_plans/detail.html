@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ menu }} — Smart Cook{% endblock %}
+{% block content %}
+  <p><a href="{% url 'meal_plans:list' %}">← Всички менюта</a></p>
+
+  <h1>{{ menu }}</h1>
+  <p class="pill pill--gold" style="display:inline-block;">общо ~{{ total_calories }} ккал/ден на порция сумарно</p>
+
+  <hr class="divider--perforated">
+
+  {% for day_code, day_label, entries in days_with_entries %}
+    <div class="day-block">
+      <h3>{{ day_label }}</h3>
+      {% for entry in entries %}
+        <div class="meal-row">
+          <span class="meal-type">{{ entry.get_meal_type_display }}</span>
+          <a href="{% url 'recipes:detail' entry.recipe.pk %}" style="flex:1;">{{ entry.recipe.title }}</a>
+          <span class="pill pill--gold">{{ entry.recipe.calories_per_serving }} ккал</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% empty %}
+    <p>Това меню все още няма добавени ястия.</p>
+  {% endfor %}
+
+  <hr class="divider--perforated">
+
+  <h2>Коментари</h2>
+  {% for comment in comments %}
+    <div class="comment">
+      <div class="comment-meta">
+        {{ comment.user.username }} · {{ comment.created_at|date:"d.m.Y" }}
+        {% if comment.rating %} · оценка {{ comment.rating }}/5{% endif %}
+      </div>
+      <p style="margin:0;">{{ comment.content }}</p>
+    </div>
+  {% empty %}
+    <p>Все още няма коментари за това меню.</p>
+  {% endfor %}
+
+  {% if user.is_authenticated %}
+    <form method="post" action="{% url 'comments:add' 'meal_plans' 'weeklymenu' menu.pk %}" style="max-width:32rem; margin-top:1.5rem;">
+      {% csrf_token %}
+      {{ comment_form.as_p }}
+      <button class="btn" type="submit">Публикувай коментар</button>
+    </form>
+  {% else %}
+    <p><a href="{% url 'login' %}">Влез</a>, за да коментираш.</p>
+  {% endif %}
+{% endblock %}

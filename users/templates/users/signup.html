@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Регистрация — Smart Cook{% endblock %}
+{% block content %}
+  <h1>Регистрация</h1>
+  <form method="post" style="max-width: 24rem;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn" type="submit" style="margin-top:1rem;">Създай акаунт</button>
+  </form>
+  <p style="margin-top:1rem;">Вече имаш акаунт? <a href="{% url 'login' %}">Влез тук</a>.</p>
+{% endblock %}

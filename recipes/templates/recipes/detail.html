@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ recipe.title }} — Smart Cook{% endblock %}
+{% block content %}
+  <p><a href="{% url 'recipes:list' %}">← Всички рецепти</a></p>
+
+  {% if recipe.image %}
+    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="width:100%; max-height:22rem; object-fit:cover; border-radius:3px; margin-bottom:1.5rem;">
+  {% endif %}
+
+  <h1>{{ recipe.title }}</h1>
+  <div class="meta" style="margin-bottom:1.5rem;">
+    <span class="pill pill--gold">{{ recipe.calories_per_serving }} ккал/порция</span>
+    <span class="pill">{{ recipe.total_calories }} ккал общо</span>
+    <span class="pill">{{ recipe.servings }} порции</span>
+    <span class="pill">{{ recipe.prep_time_minutes }} мин. приготвяне</span>
+    {% for tag in recipe.dietary_tags.all %}<span class="pill">{{ tag.name }}</span>{% endfor %}
+  </div>
+
+  <h2>Съставки</h2>
+  <table>
+    <thead><tr><th>Продукт</th><th class="num">Количество</th></tr></thead>
+    <tbody>
+      {% for ingredient in recipe.ingredients.all %}
+        <tr>
+          <td>{{ ingredient.product.name }}{% if ingredient.optional %} <span class="pill">по желание</span>{% endif %}</td>
+          <td class="num">{{ ingredient.quantity_grams }}{{ ingredient.product.unit }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <hr class="divider--perforated">
+
+  <h2>Начин на приготвяне</h2>
+  <p style="white-space: pre-line;">{{ recipe.instructions }}</p>
+
+  <hr class="divider--perforated">
+
+  <h2>Коментари</h2>
+  {% for comment in comments %}
+    <div class="comment">
+      <div class="comment-meta">
+        {{ comment.user.username }} · {{ comment.created_at|date:"d.m.Y" }}
+        {% if comment.rating %} · оценка {{ comment.rating }}/5{% endif %}
+      </div>
+      <p style="margin:0;">{{ comment.content }}</p>
+    </div>
+  {% empty %}
+    <p>Все още няма коментари — бъди първи/а.</p>
+  {% endfor %}
+
+  {% if user.is_authenticated %}
+    <form method="post" action="{% url 'comments:add' 'recipes' 'recipe' recipe.pk %}" style="max-width:32rem; margin-top:1.5rem;">
+      {% csrf_token %}
+      {{ comment_form.as_p }}
+      <button class="btn" type="submit">Публикувай коментар</button>
+    </form>
+  {% else %}
+    <p><a href="{% url 'login' %}">Влез</a>, за да коментираш.</p>
+  {% endif %}
+{% endblock %}
